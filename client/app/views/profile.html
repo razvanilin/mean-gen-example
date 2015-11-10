@@ -1,0 +1,125 @@
+<div class="row">
+	<ng-include src="'views/menu.html'"></ng-include>
+	<div class="col-md-9">
+		<div class="row">
+			<h2>Edit your profile</h2>
+		</div>
+
+		<div class="row top-buffer hidden-xs hidden-sm"></div>
+		<div class="row top-buffer-small hidden-md hidden-lg"></div>
+
+		<form role="form" class="form-horizontal">
+		  <div class="form-group">
+		  	<label for="inputFirstname" class="col-sm-4 control-label">First Name</label>
+		  	<div class="col-sm-4">
+			  	<input type="text" ng-model="profile.profile.firstname" class="form-control" id="inputFirstname" placeholder="First Name" required>
+		  	</div>
+		  </div>
+
+		  <div class="form-group">
+		  	<label for="inputLastname" class="col-sm-4 control-label">Last Name</label>
+		  	<div class="col-sm-4">
+			  	<input type="text" ng-model="profile.profile.lastname" class="form-control" id="inputLastname" placeholder="First Name">
+		  	</div>
+		  </div>
+
+		  <div class="form-group">
+		    <label for="inputEmail" class="col-sm-4 control-label">Email</label>
+		    <div class="col-sm-4">
+		      <input type="email" ng-model="profile.email" class="form-control" id="inputEmail" placeholder="Email" required>
+		    </div>
+		  </div>
+
+		  <div class="form-group">
+		    <div class="col-sm-offset-4 col-sm-4">
+		      <button type="submit" ng-click="saveProfile()" class="btn btn-default"><span ng-show="loading" class="glyphicon glyphicon-refresh glyphicon-refresh-animate"></span> Save Profile</button>
+		    </div>
+		  </div>
+		  <div ng-show="success" class="alert alert-success" role="alert">{{ success }}</div>
+		  <div ng-show="error" class="alert alert-danger" role="alert">{{error}}</div>
+		</form>
+
+    <div class="row">
+
+	        <div class="col-md-offset-1 col-md-10">
+
+	            <h3>Select or drop images here</h3>
+
+	            <div ng-show="uploader.isHTML5">
+
+	                <!-- Example: nv-file-drop="" uploader="{Object}" options="{Object}" filters="{String}" -->
+	                <div nv-file-drop="" uploader="uploader" options="{ url: uploader.url }">
+	                    <div nv-file-over="" uploader="uploader" over-class="another-file-over-class" class="row well my-drop-zone">
+
+										<div class="col-md-4" ng-repeat="upload in profile.uploads" style="margin-bottom:10px;">
+											<a ng-href="" class="thumbnail" style="margin-bottom:10px"><img class="img-rounded" ng-src="{{ host }}{{ upload }}" style="height:100px;"></a>
+											<div><a class="btn btn-success" ng-href="" ng-click="changeAvatar(upload, 'change')"><span class="glyphicon glyphicon-ok"></span></a> <a class="btn btn-danger" ng-href="" ng-click="changeAvatar(upload, 'delete')"><span class="glyphicon glyphicon-remove"></span></a></div>
+										</div>
+	                        <h1 ng-if="profile.uploads.length == 0"><span class="glyphicon glyphicon-open-file"></span></h1>
+	                    </div>
+	                </div>
+	            </div>
+
+	            <!-- Example: nv-file-select="" uploader="{Object}" options="{Object}" filters="{String}" -->
+	            <input type="file" nv-file-select="" uploader="uploader"/>
+
+	            <div ng-show="avatarChangeStatus == 1" class="alert alert-success top-buffer" role="alert">Picture changed</div>
+				<div ng-show="avatarChangeStatus == 2" class="alert alert-success top-buffer" role="alert">Picture removed</div>
+				<div ng-show="avatarChangeStatus == 3" class="alert alert-danger top-buffer" role="alert">There was an error with your request. Please try again later.</div>
+
+	        </div>
+	    </div>
+
+	    <div class="row top-buffer">
+	        <div class="col-md-offset-1 col-md-10" ng-show="uploader.queue.length > 0" style="margin-bottom: 40px">
+	            <h3 id="upload">Upload your avatar</h3>
+
+	            <div ng-repeat="item in uploader.queue" class="panel panel-default text-center" style="padding-top:20px;">
+	            	<div class="row">
+	                	<div class="col-md-offset-1 col-md-5">
+	                		<strong>{{ item.file.name }}</strong>
+	                		<div class="cropArea">
+			                    <img-crop image="item.image" result-image="item.croppedImage" result-image-size="500" ng-image-quality="1"></img-crop>
+			                </div>
+			                <p ng-show="uploader.isHTML5" nowrap>{{ item.file.size/1024/1024|number:2 }} MB</p>
+	                	</div>
+	                	<div class="col-md-6">
+	                		<div>Cropped Image:</div>
+			                <div><img ng-src="{{item.croppedImage}}" style="height:200px;"/></div>
+	                	</div>
+	            	</div>
+
+	            	<div class="row" ng-show="uploader.isHTML5">
+	            		<div class="btn-group" role="group">
+	            			<button type="button" class="btn btn-success" ng-click="item.upload()" ng-disabled="item.isReady || item.isUploading || item.isSuccess">
+			                    <span class="glyphicon glyphicon-upload"></span> Upload
+			                </button>
+			                <button type="button" class="btn btn-warning" ng-click="item.cancel()" ng-disabled="!item.isUploading">
+			                    <span class="glyphicon glyphicon-ban-circle"></span> Cancel
+			                </button>
+			                <button type="button" class="btn btn-danger" ng-click="item.remove()">
+			                    <span class="glyphicon glyphicon-trash"></span> Remove
+			                </button>
+			                <h2 style="display:table-row">
+				                <span ng-show="item.isSuccess"><i class="glyphicon glyphicon-ok"></i></span>
+				                <span ng-show="item.isCancel"><i class="glyphicon glyphicon-ban-circle"></i></span>
+				                <span ng-show="item.isError"><i class="glyphicon glyphicon-remove"></i></span>
+			                </h2>
+	            		</div>
+	            		<div class="progress" style="margin-top:10px;margin-left:auto;margin-right:auto;width:50%;">
+		                    <div class="progress-bar" ng-class="{'progress-bar-success':item.isSuccess, 'progress-bar-warning':isCancel, 'progress-bar-danger':isError}" role="progressbar" ng-style="{ 'width': item.progress + '%' }"></div>
+			            </div>
+
+	            		<!--div class="text-center">
+			                <span ng-show="item.isSuccess"><i class="glyphicon glyphicon-ok"></i></span>
+			                <span ng-show="item.isCancel"><i class="glyphicon glyphicon-ban-circle"></i></span>
+			                <span ng-show="item.isError"><i class="glyphicon glyphicon-remove"></i></span>
+			            </div-->
+
+	            	</div>
+	            </div>
+	    	</div>
+	    	<div ng-show="error" class="alert alert-danger" role="alert" style="width:50%;margin-left:auto;margin-right:auto;margin-top:10px;">{{ error }}</div>
+	    </div>
+	</div>
+</div>
